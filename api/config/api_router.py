@@ -1,14 +1,13 @@
 from django.conf import settings
 from rest_framework.routers import DefaultRouter, SimpleRouter
-
-from api.users.api.views import UserViewSet
+from players import views
 
 if settings.DEBUG:
     router = DefaultRouter()
 else:
     router = SimpleRouter()
 
-router.register("users", UserViewSet)
+router.register(r'players', views.PlayerViewSet)
 
 
 app_name = "api"
