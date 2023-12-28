@@ -7,7 +7,7 @@ if settings.DEBUG:
 else:
     router = SimpleRouter()
 
-router.register(r'players', views.PlayerViewSet)
+router.register(r'players', views.PlayerViewSet, basename="player")
 
 
 app_name = "api"
