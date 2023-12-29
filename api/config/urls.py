@@ -6,7 +6,7 @@ from django.views import defaults as default_views
 from django.views.generic import TemplateView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework.authtoken.views import obtain_auth_token
-from players.views import *
+from apps.players.views import *
 
 
 urlpatterns = [
@@ -32,8 +32,8 @@ urlpatterns += [
         SpectacularSwaggerView.as_view(url_name="api-schema"),
         name="api-docs",
     ),
-    path('api/clubs/', ClubListView.as_view()),
-    path('api/attributes/', PlayerAttributesListView.as_view()),
+    path("api/clubs/", ClubListView.as_view()),
+    path("api/attributes/", PlayerAttributesListView.as_view()),
 ]
 
 if settings.DEBUG:
@@ -61,4 +61,3 @@ if settings.DEBUG:
         import debug_toolbar
 
         urlpatterns = [path("__debug__/", include(debug_toolbar.urls))] + urlpatterns
-        

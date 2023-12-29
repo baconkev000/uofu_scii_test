@@ -1,27 +1,29 @@
 from django.db import models
 
+
 class Player(models.Model):
     """
     Player
     A class model for a player
     """
-    Name = models.CharField(max_length=255,null=True)
-    Nationality = models.CharField(max_length=50,null=True)
-    National_Position = models.CharField(max_length=5,null=True)
+
+    Name = models.CharField(max_length=255, null=True)
+    Nationality = models.CharField(max_length=50, null=True)
+    National_Position = models.CharField(max_length=5, null=True)
     National_Kit = models.PositiveIntegerField(null=True)
-    Club = models.CharField(max_length=255,null=True)
-    Club_Position = models.CharField(max_length=5,null=True)
+    Club = models.CharField(max_length=255, null=True)
+    Club_Position = models.CharField(max_length=5, null=True)
     Club_Kit = models.PositiveIntegerField(null=True)
     Club_Joining = models.CharField(null=True)
     Contract_Expiry = models.PositiveIntegerField(null=True)
     Rating = models.PositiveIntegerField(null=True)
-    Height = models.CharField(max_length=10,null=True)
-    Weight = models.CharField(max_length=10,null=True)
-    Preffered_Foot = models.CharField(max_length=10,null=True)
+    Height = models.CharField(max_length=10, null=True)
+    Weight = models.CharField(max_length=10, null=True)
+    Preffered_Foot = models.CharField(max_length=10, null=True)
     Birth_Date = models.CharField(null=True)
     Age = models.PositiveIntegerField(null=True)
-    Preffered_Position = models.CharField(max_length=10,null=True)
-    Work_Rate = models.CharField(max_length=20,null=True)
+    Preffered_Position = models.CharField(max_length=10, null=True)
+    Work_Rate = models.CharField(max_length=20, null=True)
     Weak_foot = models.PositiveIntegerField(null=True)
     Skill_Moves = models.PositiveIntegerField(null=True)
     Ball_Control = models.PositiveIntegerField(null=True)
