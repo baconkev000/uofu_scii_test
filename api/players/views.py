@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404
 from rest_framework import permissions, viewsets
 from .models import Player
 
@@ -10,66 +10,55 @@ from rest_framework import generics
 
 class PlayerViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    A simple viewset for listing players
+    A Simple Viewset for listing players and retreiving a player by name
     """
     queryset = Player.objects.all()
     serializer_class = PlayerSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = 'Name'
     
-    
-class PlayerNameList(generics.ListAPIView):
-    queryset = Player.objects.all()
-    serializer_class = PlayerSerializer
-
-    def list(self, request, *args, **kwargs):
-        """
-        A simple list view for listing all player names
-        """
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        return Response([item['Name'] for item in serializer.data])
-    
-class PlayerByName(generics.ListAPIView):
-    serializer_class = PlayerSerializer
-    
-    def get_queryset(self):
-        """
-        A simple view for retrieving players by name
-        """
-        playerName = self.kwargs['name']
-        return Player.objects.filter(Name=playerName)
-    
-class ClubList(generics.ListAPIView):
+class ClubListView(generics.ListAPIView):
+    """
+    A simple list view for listing clubs and the associated players
+    """
     serializer_class = PlayerSerializer
     
     def get_queryset(self):
             return Player.objects.all()
 
-    def list(self, request, *args, **kwargs):
+    def list(self, request):
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
 
         # Group players by club
         clubs_dict = {}
+        i = 0
         for player_data in serializer.data:
             club_name = player_data['Club']
             player_name = player_data['Name']
 
             if club_name not in clubs_dict:
-                clubs_dict[club_name] = {'name': club_name, 'players': []}
+                i += 1
+                clubs_dict[club_name] = {'id': i, 'name': club_name, 'players': []}
 
             clubs_dict[club_name]['players'].append(player_name)
 
         clubs_list = [club_info for club_info in clubs_dict.values()]
         return Response(clubs_list)
     
-class AttributeNameList(generics.ListAPIView):
+class PlayerAttributesListView(generics.ListAPIView):
+    """
+    A simple list view for listing player attribute names
+    """
     queryset = Player.objects.all()
     serializer_class = PlayerSerializer
 
-    def list(self, request, *args, **kwargs):
-        """
-        A simple list view for listing all player names
-        """
+    def list(self, request):
         queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        return Response([item['Attribute'] for item in serializer.data])
+        serializer = self.get_serializer(queryset.first())  # Get the first player's data
+
+        # Exclude specific fields from attribute names
+        excluded_fields = ["id", "Name"]
+        attribute_names = [key for key in serializer.data.keys() if key not in excluded_fields]
+
+        return Response(attribute_names)

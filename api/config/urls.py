@@ -32,10 +32,8 @@ urlpatterns += [
         SpectacularSwaggerView.as_view(url_name="api-schema"),
         name="api-docs",
     ),
-    path('api/players/names/', PlayerNameList.as_view()),
-    path('api/players/names/<name>/', PlayerByName.as_view()),
-    path('api/clubs/', ClubList.as_view()),
-    path('api/attributes/', AttributeNameList.as_view()),
+    path('api/clubs/', ClubListView.as_view()),
+    path('api/attributes/', PlayerAttributesListView.as_view()),
 ]
 
 if settings.DEBUG:
