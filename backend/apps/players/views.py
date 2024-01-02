@@ -16,8 +16,10 @@ class PlayerViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = Player.objects.all()
     serializer_class = PlayerSerializer
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [permissions.IsAuthenticated]
+    # add SessionAuthentication & BasicAuthentication for auth token requirement
+    authentication_classes = []
+    # add permissions.IsAuthenticate for auth token requirement
+    permission_classes = []
     lookup_field = "Name"
 
 
