@@ -22,3 +22,9 @@ These instructions will get you through launching phase of this project.
       $ docker compose up -d --build
 
 - Follow Project Setup Instructions from [Backend Readme](https://github.com/baconkev000/uofu_scii_test/blob/main/backend/README.md)
+
+
+### Project Urls
+
+- Frontend port at [localhost:8080](http://localhost:8080)
+- Backend port at [localhost:8000](http://localhost:8080)
