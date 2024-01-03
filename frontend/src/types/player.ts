@@ -1,7 +1,7 @@
 export interface Player {
   model: string;
   pk: number;
-  fields?: {
+  fields: {
     Name?: string;
     Nationality?: string;
     National_Position?: string;

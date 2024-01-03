@@ -23,4 +23,22 @@ export class APIService {
    * @returns Promise
    */
   static getPlayers = async () => instance.get("api/players/");
+
+  /**
+   * Get Player By Name
+   * @returns Promise
+   */
+  static getPlayerByName = async () => instance.get("api/playesrs/{name}");
+
+  /**
+   * Get Attributes
+   * @returns Promise
+   */
+  static getAttributes = async () => instance.get("api/attributes/");
+
+  /**
+   * Get Clubs
+   * @returns Promise
+   */
+  static getClubs = async () => instance.get("api/clubs/");
 }

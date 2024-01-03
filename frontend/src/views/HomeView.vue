@@ -1,103 +1,92 @@
 <template>
-  <div class="w-full flex justify-center items-center flex-col">
-    <div class="flex flex-row justify-end w-5/6 py-8">
-      <button
-        id="dropdownCheckboxButton"
-        data-dropdown-toggle="dropdownDefaultCheckbox"
-        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-        type="button"
-      >
-        Dropdown checkbox
-        <svg
-          class="w-2.5 h-2.5 ms-3"
-          aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 10 6"
-        >
-          <path
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="m1 1 4 4 4-4"
-          />
-        </svg>
-      </button>
+  <div class="w-full flex-col">
+    <!-- Dropdown -->
 
-      <!-- Dropdown menu -->
-      <div
-        id="dropdownDefaultCheckbox"
-        class="z-10 hidden w-48 bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600"
-      >
-        <ul
-          class="p-3 space-y-3 text-sm text-gray-700 dark:text-gray-200"
-          aria-labelledby="dropdownCheckboxButton"
+    <div class="flex flex-row justify-end w-5/6 py-8">
+      <div class="relative inline-block text-left">
+        <div>
+          <button
+            type="button"
+            class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+            id="menu-button"
+            aria-expanded="true"
+            aria-haspopup="true"
+            @click="toggleDropdown()"
+          >
+            Attributes
+            <svg
+              class="-mr-1 h-5 w-5 text-gray-400"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </button>
+        </div>
+        <div
+          v-show="isDropdownOpen"
+          @click="toggleDropdown"
+          class="fixed inset-0 bg-black opacity-25 z-9"
+        ></div>
+        <div
+          v-show="isDropdownOpen"
+          class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+          role="menu"
+          aria-orientation="vertical"
+          aria-labelledby="menu-button"
+          tabindex="-1"
         >
-          <li>
-            <div class="flex items-center">
+          <div class="py-1" role="none">
+            <label
+              v-for="attribute in attributes"
+              :key="attribute"
+              class="flex items-center px-4 py-2 text-sm"
+            >
               <input
-                id="checkbox-item-1"
                 type="checkbox"
-                value=""
-                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+                :value="attribute"
+                v-model="selectedAttributes"
+                class="mr-2"
+                @click="updateAttrs(attribute)"
               />
-              <label
-                for="checkbox-item-1"
-                class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                >Default checkbox</label
-              >
-            </div>
-          </li>
-          <li>
-            <div class="flex items-center">
-              <input
-                checked
-                id="checkbox-item-2"
-                type="checkbox"
-                value=""
-                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
-              />
-              <label
-                for="checkbox-item-2"
-                class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                >Checked state</label
-              >
-            </div>
-          </li>
-          <li>
-            <div class="flex items-center">
-              <input
-                id="checkbox-item-3"
-                type="checkbox"
-                value=""
-                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
-              />
-              <label
-                for="checkbox-item-3"
-                class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                >Default checkbox</label
-              >
-            </div>
-          </li>
-        </ul>
+              {{ attribute }}
+            </label>
+          </div>
+        </div>
       </div>
     </div>
-
-    <div class="relative overflow-x-auto shadow-md">
-      <table class="w-full text-sm text-left rtl:text-right text-black">
+    <!-- Table -->
+    <div class="w-3/4 mx-auto overflow-x-auto shadow-lg">
+      <table class="w-full text-sm text-center rtl:text-right text-black">
         <thead class="text-xs text-gray-700 uppercase bg-gray-600 text-white">
           <tr>
-            <th v-for="row in t_rows" :key="row" scope="col" class="px-6 py-3">
+            <th
+              @click="updateSorted('Name')"
+              scope="col"
+              class="px-6 py-3 cursor-pointer"
+            >
+              Name
+            </th>
+            <th
+              v-for="row in selectedAttributes"
+              :key="row"
+              @click="updateSorted(row)"
+              scope="col"
+              class="px-6 py-3 cursor-pointer"
+            >
               {{ row }}
             </th>
           </tr>
         </thead>
-        <div v-if="loading">Loading...</div>
         <tbody>
           <tr
             class="bg-white border-b bg-slate-200 even:bg-gray-100 odd:bg-gray-200 hover:bg-white cursor-pointer"
-            v-for="player in players"
+            v-for="player in sortedPlayers"
             :key="player.pk"
           >
             <th
@@ -106,29 +95,12 @@
             >
               {{ player.Name }}
             </th>
-            <td class="px-6 py-4">
-              {{ player.Nationality ? player.Nationality : "N/A" }}
-            </td>
-            <td class="px-6 py-4">
-              {{ player.National_Position ? player.Nationality : "N/A" }}
-            </td>
-            <td class="px-6 py-4">
-              {{ player.Club ? player.Club : "N/A" }}
-            </td>
-            <td class="px-6 py-4">
-              {{ player.Height ? player.Height : "N/A" }}
-            </td>
-            <td class="px-6 py-4">
-              {{ player.Preffered_Foot ? player.Preffered_Foot : "N/A" }}
-            </td>
-            <td class="px-6 py-4">
-              {{ player.Ball_Control ? player.Ball_Control : "N/A" }}
-            </td>
-            <td class="px-6 py-4">
-              {{ player.Dribbling ? player.Dribbling : "N/A" }}
-            </td>
-            <td class="px-6 py-4">
-              {{ player.Vision ? player.Vision : "N/A" }}
+            <td
+              v-for="attr in selectedAttributes"
+              :key="attr"
+              class="px-6 py-4"
+            >
+              {{ player[attr] ? player[attr] : "N/A" }}
             </td>
           </tr>
         </tbody>
@@ -141,30 +113,109 @@
 import { Vue } from "vue-class-component";
 import { APIService } from "@/services/api";
 import type { Player } from "@/types/player";
-import { ref } from "vue";
-import type { Ref } from "vue";
-
 export default class HomeView extends Vue {
-  t_rows: Ref<string[]> = ref([
-    "Name",
+  selectedAttributes: string[] = [
     "Nationality",
-    "National Position",
+    "National_Position",
     "Club",
     "Height",
-    "Preferred Foot",
-    "Ball Control",
+    "Preffered_Foot",
+    "Ball_Control",
     "Dribbling",
     "Vision",
-  ]);
-  loading = ref(true);
-  players: Ref<Player[]> = ref([]);
+  ];
+  sortedPlayers: Player[] = [];
+  attributes: string[] = [];
+  isDropdownOpen = false;
+
+  toggleDropdown() {
+    this.isDropdownOpen = !this.isDropdownOpen;
+  }
+
+  updateAttrs(attr: string): void {
+    const index = this.selectedAttributes.indexOf(attr);
+
+    if (index !== -1) {
+      // If the attribute is already selected, remove it
+      this.selectedAttributes.splice(index, 1);
+    } else {
+      // If the attribute is not selected, add it
+      this.selectedAttributes.push(attr);
+    }
+  }
+
+  updateSorted(header: string): void {
+    console.log(header);
+    header = header.split(" ").join("_");
+    this.sortedPlayers = this.sortedPlayers.sort(
+      (playerA: Player, playerB: Player) => {
+        const aValue = playerA[header as keyof typeof playerA];
+        const bValue = playerB[header as keyof typeof playerA];
+
+        const compareValues = (aValue: any, bValue: any): number => {
+          // If both values are null, consider them equal
+          if (aValue === null && bValue === null) {
+            return 0;
+          }
+
+          // If only aValue is null, prioritize it to the bottom
+          if (aValue === null) {
+            return 1;
+          }
+
+          // If only bValue is null, prioritize it to the bottom
+          if (bValue === null) {
+            return -1;
+          }
+
+          // The rest of your comparison logic for non-null values
+          return aValue.localeCompare(bValue);
+        };
+
+        const compareNumbers = (aValue: number, bValue: number) => {
+          return aValue - bValue;
+        };
+
+        if (typeof aValue === "string" && typeof bValue === "string") {
+          return aValue.localeCompare(bValue);
+        } else if (typeof aValue === "number" && typeof bValue === "number") {
+          return compareNumbers(aValue, bValue);
+        } else {
+          return compareValues(aValue, bValue);
+        }
+      }
+    );
+  }
 
   async mounted() {
-    console.log(this.players);
-    APIService.getPlayers()
-      .then((response) => (this.players = response.data))
-      .catch((error) => console.log(error))
-      .finally((this.loading = false));
+    document.body.addEventListener("click", this.handleBodyClick);
+    // get players
+    try {
+      const response = await APIService.getPlayers();
+      this.sortedPlayers = response.data;
+    } catch (error) {
+      console.log(error);
+    }
+    // get attributes
+    try {
+      const response = await APIService.getAttributes();
+      this.attributes = response.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  beforeUnmount() {
+    // Remove the click event listener when the component is about to be destroyed
+    document.body.removeEventListener("click", this.handleBodyClick);
+  }
+
+  handleBodyClick(event: MouseEvent) {
+    // Check if the clicked element is outside the dropdown
+    const dropdownElement = this.$el.querySelector(".attr-dropdown");
+
+    if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
+      this.isDropdownOpen = false;
+    }
   }
 }
 </script>
