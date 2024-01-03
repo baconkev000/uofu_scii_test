@@ -11,19 +11,6 @@ License: MIT
 
 Moved to [settings](http://cookiecutter-django.readthedocs.io/en/latest/settings.html).
 
-### Setting Up Your Project
-
-- To create a **superuser account**, use this command:
-
-      $ docker compose run --rm django ./manage.py createsuperuser
-
-For convenience, you can keep your normal user logged in on Chrome and your superuser logged in on Firefox (or similar), so that you can see how the site behaves for both kinds of users.
-
-- To load pre-created players data run:
-
-      $ docker compose run --rm django ./manage.py loaddata soccer_small
-
-
 ### Type checks
 
 Running type checks with manage.py:

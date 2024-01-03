@@ -26,7 +26,13 @@ These instructions will get you through launching phase of this project.
 
       $ docker compose up -d --build
 
-- Follow Project Setup Instructions from [Backend Readme](https://github.com/baconkev000/uofu_scii_test/blob/main/backend/README.md)
+- To create a **superuser account**, use this command:
+
+      $ docker compose run --rm django ./manage.py createsuperuser
+
+- To load pre-created players data run:
+
+      $ docker compose run --rm django ./manage.py loaddata soccer_small
 
 
 ### Project Urls
