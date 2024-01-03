@@ -5,7 +5,6 @@ WORKDIR /app
 COPY package*.json ./
 
 RUN yarn install
-RUN npm install @vue/cli-service --save-dev
 
 COPY . .
 
