@@ -2,14 +2,6 @@
 
 ## Project setup
 ```
-npm install @vue/cli-service --save-dev
-```
-
-
-# For separate build from root project
-
-## Project setup
-```
 yarn install
 ```
 
