@@ -19,9 +19,9 @@ These instructions will get you through launching phase of this project.
 - Clone this repository
 
 - CD into the frotnend directory and install vue-cli-service using the command:
-```
-cd frontend && npm install @vue/cli-service --save-dev && cd ../
-```
+      ```
+      cd frontend && npm install @vue/cli-service --save-dev && cd ../
+      ```
 
 - To launch, run the command:
 
