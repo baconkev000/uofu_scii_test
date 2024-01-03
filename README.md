@@ -21,3 +21,4 @@ These instructions will get you through launching phase of this project.
 
       $ docker compose up -d --build
 
+- Follow Project Setup Instructions from [Backend Readme](https://github.com/baconkev000/uofu_scii_test/blob/main/backend/README.md)
