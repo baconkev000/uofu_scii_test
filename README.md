@@ -38,4 +38,4 @@ These instructions will get you through launching phase of this project.
 ### Project Urls
 
 - Frontend port at [localhost:8080](http://localhost:8080)
-- Backend port at [localhost:8000](http://localhost:8080)
+- Backend port at [localhost:8000](http://localhost:8000)
