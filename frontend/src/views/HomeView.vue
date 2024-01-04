@@ -1,6 +1,6 @@
 <template>
   <div class="w-full flex space-between">
-    <div class="w-1/2 flex-col">
+    <div class="w-3/4 flex-col">
       <!-- Dropdown -->
       <div class="flex flex-row justify-end w-5/6 py-8">
         <div class="relative inline-block text-left">
@@ -109,10 +109,7 @@
         </table>
       </div>
     </div>
-    <PlayerVisuals
-      :players="sortedPlayers"
-      class="min-h-screen"
-    ></PlayerVisuals>
+    <PlayerVisuals :players="sortedPlayers" class="mt-24"></PlayerVisuals>
   </div>
 </template>
 

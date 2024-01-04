@@ -1,7 +1,7 @@
 <template>
   <div>
     <h2>Numerical Skills</h2>
-    <canvas ref="numericalChart" class="h-1/2"></canvas>
+    <canvas ref="numericalChart" class="w-1/4"></canvas>
 
     <h2>Categorical Variables Skill</h2>
     <canvas ref="categoricalChart"></canvas>
@@ -19,12 +19,63 @@ import type { Player } from "@/types/player";
     Chart,
   },
   props: {
-    players: Array,
+    players: Array as () => Player[],
   },
 })
 export default class PlayerVisuals extends Vue {
   players!: [];
   playersData: Player[] | null = null;
+
+  numericalLabels: string[] = [
+    "Rating",
+    "Age",
+    "Weak_foot",
+    "Skill_Moves",
+    "Ball_Control",
+    "Dribbling",
+    "Marking",
+    "Sliding_Tackle",
+    "Standing_Tackle",
+    "Aggression",
+    "Reactions",
+    "Attacking_Position",
+    "Interceptions",
+    "Vision",
+    "Composure",
+    "Crossing",
+    "Short_Pass",
+    "Long_Pass",
+    "Acceleration",
+    "Speed",
+    "Stamina",
+    "Strength",
+    "Balance",
+    "Agility",
+    "Jumping",
+    "Heading",
+    "Shot_Power",
+    "Finishing",
+    "Long_Shots",
+    "Curve",
+    "Freekick_Accuracy",
+    "Penalties",
+    "Volleys",
+    "GK_Positioning",
+    "GK_Diving",
+    "GK_Kicking",
+    "GK_Handling",
+    "GK_Reflexes",
+  ];
+
+  categoricalLabels: string[] = [
+    "Nationality",
+    "Preffered_Foot",
+    "Work_Rate",
+    "National_Position",
+    "Club",
+    "Club_Position",
+    "Club_Joining",
+  ];
 
   @Watch("players")
   async onPlayersChange(newPlayers: Array<any>) {
@@ -46,21 +97,19 @@ export default class PlayerVisuals extends Vue {
   }
 
   private createNumericalChart() {
-    let numericalLabels = Object.keys(this.players[0]).filter(
-      (key) => typeof this.players[0][key] === "number"
-    );
-    numericalLabels = numericalLabels.slice(1);
-    numericalLabels = numericalLabels.slice(
-      numericalLabels.indexOf("Contract_Expirey")
+    this.numericalLabels = this.numericalLabels.slice(1);
+    this.numericalLabels = this.numericalLabels.slice(
+      this.numericalLabels.indexOf("Contract_Expirey")
     );
     const numericalData = this.players.map((player) =>
-      numericalLabels.map((label) => player[label] as number)
+      this.numericalLabels.map((label) => player[label] as number)
     );
 
     const datasets = numericalData.map((data, index) => {
       const randomColor = this.getRandomColor();
+      const p = this.players[index] as any;
       return {
-        label: this.players[index].Name,
+        label: p.Name,
         data: data.map((value, i) => ({ x: value, y: value })),
         backgroundColor: `rgba(${randomColor.r}, ${randomColor.g}, ${randomColor.b}, 0.2)`,
         borderColor: `rgba(${randomColor.r}, ${randomColor.g}, ${randomColor.b}, 1)`,
@@ -72,7 +121,7 @@ export default class PlayerVisuals extends Vue {
 
     this.createScatterChart(
       "numericalChart",
-      numericalLabels,
+      this.numericalLabels,
       datasets,
       "Numerical Skills"
     );
@@ -86,17 +135,15 @@ export default class PlayerVisuals extends Vue {
   }
 
   private createCategoricalChart() {
-    const categoricalLabels = Object.keys(this.players[0]).filter(
-      (key) => typeof this.players[0][key] === "string"
-    );
-
-    const categoricalData = this.players.map((player) =>
-      categoricalLabels.map((label) => player[label] as string)
-    );
+    const categoricalData = this.players
+      .map((player) =>
+        this.categoricalLabels.map((label) => player[label] as string)
+      )
+      .flat(); // Use flat() to flatten the array
 
     this.createPieChart(
       "categoricalChart",
-      categoricalLabels,
+      this.categoricalLabels,
       categoricalData,
       "Categorical Skills"
     );
@@ -108,7 +155,7 @@ export default class PlayerVisuals extends Vue {
     datasets: any[],
     title: string
   ) {
-    const ctx = (this.$refs[canvasRef] as HTMLCanvasElement).getContext("2d");
+    const ctx = (this.$refs[canvasRef] as HTMLCanvasElement).getContext("2d")!;
     new Chart(ctx, {
       type: "scatter",
       data: {
@@ -134,7 +181,7 @@ export default class PlayerVisuals extends Vue {
     data: string[],
     title: string
   ) {
-    const ctx = (this.$refs[canvasRef] as HTMLCanvasElement).getContext("2d");
+    const ctx = (this.$refs[canvasRef] as HTMLCanvasElement).getContext("2d")!;
     new Chart(ctx, {
       type: "pie",
       data: {
