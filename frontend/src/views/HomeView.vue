@@ -1,118 +1,132 @@
 <template>
-  <div class="w-full flex-col">
-    <!-- Dropdown -->
-
-    <div class="flex flex-row justify-end w-5/6 py-8">
-      <div class="relative inline-block text-left">
-        <div>
-          <button
-            type="button"
-            class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-            id="menu-button"
-            aria-expanded="true"
-            aria-haspopup="true"
-            @click="toggleDropdown()"
+  <div class="w-full flex space-between">
+    <div class="w-1/2 flex-col">
+      <!-- Dropdown -->
+      <div class="flex flex-row justify-end w-5/6 py-8">
+        <div class="relative inline-block text-left">
+          <div>
+            <button
+              type="button"
+              class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+              id="menu-button"
+              aria-expanded="true"
+              aria-haspopup="true"
+              @click="toggleDropdown()"
+            >
+              Attributes
+              <svg
+                class="-mr-1 h-5 w-5 text-gray-400"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
+          <div
+            v-show="isDropdownOpen"
+            @click="toggleDropdown"
+            class="fixed inset-0 bg-black opacity-25 z-9"
+          ></div>
+          <div
+            v-show="isDropdownOpen"
+            class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+            role="menu"
+            aria-orientation="vertical"
+            aria-labelledby="menu-button"
+            tabindex="-1"
           >
-            Attributes
-            <svg
-              class="-mr-1 h-5 w-5 text-gray-400"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              aria-hidden="true"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-                clip-rule="evenodd"
-              />
-            </svg>
-          </button>
-        </div>
-        <div
-          v-show="isDropdownOpen"
-          @click="toggleDropdown"
-          class="fixed inset-0 bg-black opacity-25 z-9"
-        ></div>
-        <div
-          v-show="isDropdownOpen"
-          class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-          role="menu"
-          aria-orientation="vertical"
-          aria-labelledby="menu-button"
-          tabindex="-1"
-        >
-          <div class="py-1" role="none">
-            <label
-              v-for="attribute in attributes"
-              :key="attribute"
-              class="flex items-center px-4 py-2 text-sm"
-            >
-              <input
-                type="checkbox"
-                :value="attribute"
-                v-model="selectedAttributes"
-                class="mr-2"
-                @click="updateAttrs(attribute)"
-              />
-              {{ attribute }}
-            </label>
+            <div class="py-1" role="none">
+              <label
+                v-for="attribute in attributes"
+                :key="attribute"
+                class="flex items-center px-4 py-2 text-sm"
+              >
+                <input
+                  type="checkbox"
+                  :value="attribute"
+                  v-model="selectedAttributes"
+                  class="mr-2"
+                  @click="updateAttrs(attribute)"
+                />
+                {{ attribute }}
+              </label>
+            </div>
           </div>
         </div>
       </div>
+      <!-- Table -->
+      <div
+        class="w-3/4 mx-auto overflow-x-auto overflow-y-auto h-screen shadow-lg"
+      >
+        <table class="w-full text-sm text-center rtl:text-right text-black">
+          <thead class="text-xs text-gray-700 uppercase bg-gray-600 text-white">
+            <tr>
+              <th
+                @click="updateSorted('Name')"
+                scope="col"
+                class="px-6 py-3 cursor-pointer"
+              >
+                Name
+              </th>
+              <th
+                v-for="row in selectedAttributes"
+                :key="row"
+                @click="updateSorted(row)"
+                scope="col"
+                class="px-6 py-3 cursor-pointer"
+              >
+                {{ row }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              class="bg-white border-b bg-slate-200 even:bg-gray-100 odd:bg-gray-200 hover:bg-white cursor-pointer"
+              v-for="player in sortedPlayers"
+              :key="player.pk"
+            >
+              <th
+                scope="row"
+                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap font-bold"
+              >
+                {{ player.Name }}
+              </th>
+              <td
+                v-for="attr in selectedAttributes"
+                :key="attr"
+                class="px-6 py-4"
+              >
+                {{ player[attr] ? player[attr] : "N/A" }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-    <!-- Table -->
-    <div class="w-3/4 mx-auto overflow-x-auto shadow-lg">
-      <table class="w-full text-sm text-center rtl:text-right text-black">
-        <thead class="text-xs text-gray-700 uppercase bg-gray-600 text-white">
-          <tr>
-            <th
-              @click="updateSorted('Name')"
-              scope="col"
-              class="px-6 py-3 cursor-pointer"
-            >
-              Name
-            </th>
-            <th
-              v-for="row in selectedAttributes"
-              :key="row"
-              @click="updateSorted(row)"
-              scope="col"
-              class="px-6 py-3 cursor-pointer"
-            >
-              {{ row }}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            class="bg-white border-b bg-slate-200 even:bg-gray-100 odd:bg-gray-200 hover:bg-white cursor-pointer"
-            v-for="player in sortedPlayers"
-            :key="player.pk"
-          >
-            <th
-              scope="row"
-              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap font-bold"
-            >
-              {{ player.Name }}
-            </th>
-            <td
-              v-for="attr in selectedAttributes"
-              :key="attr"
-              class="px-6 py-4"
-            >
-              {{ player[attr] ? player[attr] : "N/A" }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <PlayerVisuals
+      :players="sortedPlayers"
+      class="min-h-screen"
+    ></PlayerVisuals>
   </div>
 </template>
 
 <script lang="ts">
-import { Vue } from "vue-class-component";
+import { Vue, Options } from "vue-class-component";
 import { APIService } from "@/services/api";
+import PlayerVisuals from "@/components/PlayerVisual.vue";
 import type { Player } from "@/types/player";
+
+@Options({
+  components: {
+    PlayerVisuals,
+  },
+})
 export default class HomeView extends Vue {
   selectedAttributes: string[] = [
     "Nationality",
