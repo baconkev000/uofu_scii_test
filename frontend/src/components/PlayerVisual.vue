@@ -1,211 +1,158 @@
 <template>
-  <div>
-    <h2>Numerical Skills</h2>
-    <canvas ref="numericalChart" class="w-1/4"></canvas>
-
-    <h2>Categorical Variables Skill</h2>
-    <canvas ref="categoricalChart"></canvas>
+  <div
+    class="py-24 w-full overflow-x-auto border-2 border-slate-300 bg-slate-200"
+  >
+    <h2>{{ selectedLabel }}</h2>
+    <svg id="myPlot" class="border-2 border-slate-500 overflow-x-auto"></svg>
   </div>
 </template>
 
 <script lang="ts">
 import { Vue, Options } from "vue-class-component";
+import type { PlayerFields } from "@/types/player_fields";
 import { Watch } from "vue-property-decorator";
-import Chart from "chart.js/auto";
-import type { Player } from "@/types/player";
-
+import num_labels from "@/fixtures/labels/numerical.json";
+import * as d3 from "d3";
 @Options({
-  components: {
-    Chart,
-  },
   props: {
-    players: Array as () => Player[],
+    players: Array as () => PlayerFields[],
+    selectedLabel: String,
+    num_labels: Array as () => string[],
+    cat_labels: Array as () => string[],
   },
 })
 export default class PlayerVisuals extends Vue {
-  players!: [];
-  playersData: Player[] | null = null;
+  players!: PlayerFields[];
+  selectedLabel!: keyof PlayerFields;
+  width = 1000;
+  height = 600;
+  margin = 40;
+  marginTop = 30;
+  marginRight = 0;
+  marginBottom = (this.height - this.margin) / 2;
+  marginLeft = 50;
+  xMax = this.width - this.margin * 2;
+  yMax = this.height / 1.5 - this.margin * 2;
 
-  numericalLabels: string[] = [
-    "Rating",
-    "Age",
-    "Weak_foot",
-    "Skill_Moves",
-    "Ball_Control",
-    "Dribbling",
-    "Marking",
-    "Sliding_Tackle",
-    "Standing_Tackle",
-    "Aggression",
-    "Reactions",
-    "Attacking_Position",
-    "Interceptions",
-    "Vision",
-    "Composure",
-    "Crossing",
-    "Short_Pass",
-    "Long_Pass",
-    "Acceleration",
-    "Speed",
-    "Stamina",
-    "Strength",
-    "Balance",
-    "Agility",
-    "Jumping",
-    "Heading",
-    "Shot_Power",
-    "Finishing",
-    "Long_Shots",
-    "Curve",
-    "Freekick_Accuracy",
-    "Penalties",
-    "Volleys",
-    "GK_Positioning",
-    "GK_Diving",
-    "GK_Kicking",
-    "GK_Handling",
-    "GK_Reflexes",
-  ];
+  updateChart() {
+    const svg = d3
+      .select("#myPlot")
+      .attr("viewBox", `0 -${this.margin} ${this.width} ${this.height}`);
 
-  categoricalLabels: string[] = [
-    "Nationality",
-    "Preffered_Foot",
-    "Work_Rate",
-    "National_Position",
-    "Club",
-    "Club_Position",
-    "Club_Joining",
-  ];
+    svg.selectAll("*").remove(); // Clear existing chart
 
-  @Watch("players")
-  async onPlayersChange(newPlayers: Array<any>) {
-    if (newPlayers) {
-      this.playersData = await newPlayers;
-      if (!this.playersData || !this.playersData.length) {
-        console.log("No players data available", this.players);
-      } else {
-        this.createNumericalChart();
-        this.createCategoricalChart();
-      }
-    } else {
-      console.warn("Players data not available");
+    if (this.players.length > 0) {
+      this.createChart(svg);
     }
   }
 
-  mounted() {
-    this.onPlayersChange(this.players);
-  }
+  createChart(svg: any) {
+    let cleanedPlayerData!: unknown[];
+    let maxYTick = 0;
+    let yAxisLabel = "";
 
-  private createNumericalChart() {
-    this.numericalLabels = this.numericalLabels.slice(1);
-    this.numericalLabels = this.numericalLabels.slice(
-      this.numericalLabels.indexOf("Contract_Expirey")
-    );
-    const numericalData = this.players.map((player) =>
-      this.numericalLabels.map((label) => player[label] as number)
-    );
+    if (num_labels.find((label: string) => label === this.selectedLabel)) {
+      cleanedPlayerData = this.players.map((p: PlayerFields) => ({
+        name: p.Name,
+        numeric: p[this.selectedLabel] ? p[this.selectedLabel] : 0,
+      }));
+      yAxisLabel = `${this.selectedLabel} Stats`;
+    } else {
+      const uniqueLabelVals = Array.from(
+        new Set(
+          this.players.map((p: PlayerFields) => {
+            return p[this.selectedLabel] ? p[this.selectedLabel] : "N/A";
+          })
+        )
+      );
+      cleanedPlayerData = uniqueLabelVals.map((uVal: any) => ({
+        name: uVal,
+        numeric: this.players.filter(
+          (player: PlayerFields) => player[this.selectedLabel] === uVal
+        ).length,
+      }));
+      yAxisLabel = `# of Players - ${this.selectedLabel}`;
+    }
+    maxYTick = Math.max(...cleanedPlayerData.map((p: any) => p.numeric));
+    console.log(maxYTick, cleanedPlayerData);
+    const x = d3
+      .scaleBand()
+      .domain(
+        d3.groupSort(
+          cleanedPlayerData,
+          ([d]: any) => -d.numeric,
+          (d: any) => d.name
+        )
+      ) // descending frequency
+      .range([0, this.xMax]);
 
-    const datasets = numericalData.map((data, index) => {
-      const randomColor = this.getRandomColor();
-      const p = this.players[index] as any;
-      return {
-        label: p.Name,
-        data: data.map((value, i) => ({ x: value, y: value })),
-        backgroundColor: `rgba(${randomColor.r}, ${randomColor.g}, ${randomColor.b}, 0.2)`,
-        borderColor: `rgba(${randomColor.r}, ${randomColor.g}, ${randomColor.b}, 1)`,
-        borderWidth: 1,
-        pointRadius: 6,
-        pointHoverRadius: 8,
-      };
-    });
+    const y = d3
+      .scaleLinear()
+      .domain([0, d3.max(cleanedPlayerData, (d: any) => d.numeric)])
+      .range([this.yMax, 0]);
 
-    this.createScatterChart(
-      "numericalChart",
-      this.numericalLabels,
-      datasets,
-      "Numerical Skills"
-    );
-  }
+    const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+    svg
+      .append("g")
+      .attr("transform", `translate(${this.marginLeft},0)`)
+      .selectAll()
+      .data(cleanedPlayerData)
+      .join("rect")
+      .attr("x", (d: any) => x(d.name))
+      .attr("y", (d: any) => y(d.numeric))
+      .attr("height", (d: any) => y(0) - y(d.numeric))
+      .attr("width", x.bandwidth())
+      .attr("fill", (_d: any, i: number) => colorScale(i.toString())); // Convert index to string
 
-  private getRandomColor() {
-    const r = Math.floor(Math.random() * 256);
-    const g = Math.floor(Math.random() * 256);
-    const b = Math.floor(Math.random() * 256);
-    return { r, g, b };
-  }
-
-  private createCategoricalChart() {
-    const categoricalData = this.players
-      .map((player) =>
-        this.categoricalLabels.map((label) => player[label] as string)
+    // Add the x-axis and label.
+    svg
+      .append("g")
+      .attr(
+        "transform",
+        `translate(${this.marginLeft},${this.height - this.marginBottom})`
       )
-      .flat(); // Use flat() to flatten the array
+      .call(d3.axisBottom(x).tickSizeOuter(0))
+      .selectAll("text")
+      .style("text-anchor", "end")
+      .attr("dx", "-0.8em")
+      .attr("dy", "0.15em")
+      .attr("transform", "rotate(-45)");
 
-    this.createPieChart(
-      "categoricalChart",
-      this.categoricalLabels,
-      categoricalData,
-      "Categorical Skills"
-    );
+    // Add the y-axis and label, and remove the domain line.
+    svg
+      .append("g")
+      .attr("transform", `translate(${this.marginLeft},0)`)
+      .call(
+        d3
+          .axisLeft(y)
+          .ticks(Math.min(maxYTick, 15))
+          .tickFormat((y: any) =>
+            (
+              (y * maxYTick) /
+              d3.max(cleanedPlayerData, (d: any) => d.numeric)
+            ).toFixed()
+          )
+      )
+      .call((g: any) => g.select(".domain").remove())
+      .call((g: any) =>
+        g
+          .append("text")
+          .attr("x", -this.marginLeft)
+          .attr("y", -10)
+          .attr("fill", "currentColor")
+          .attr("text-anchor", "start")
+          .text(`↑ ${yAxisLabel}`)
+      );
   }
 
-  private createScatterChart(
-    canvasRef: string,
-    labels: string[],
-    datasets: any[],
-    title: string
-  ) {
-    const ctx = (this.$refs[canvasRef] as HTMLCanvasElement).getContext("2d")!;
-    new Chart(ctx, {
-      type: "scatter",
-      data: {
-        labels,
-        datasets,
-      },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true,
-          },
-          x: {
-            beginAtZero: true,
-          },
-        },
-      },
-    });
+  @Watch("selectedLabel")
+  @Watch("players")
+  async onPlayersChange() {
+    this.updateChart();
   }
 
-  private createPieChart(
-    canvasRef: string,
-    labels: string[],
-    data: string[],
-    title: string
-  ) {
-    const ctx = (this.$refs[canvasRef] as HTMLCanvasElement).getContext("2d")!;
-    new Chart(ctx, {
-      type: "pie",
-      data: {
-        labels,
-        datasets: [
-          {
-            data,
-            backgroundColor: [
-              "rgba(255, 99, 132, 0.2)",
-              "rgba(54, 162, 235, 0.2)",
-              "rgba(255, 206, 86, 0.2)",
-              "rgba(75, 192, 192, 0.2)",
-            ],
-            borderColor: [
-              "rgba(255, 99, 132, 1)",
-              "rgba(54, 162, 235, 1)",
-              "rgba(255, 206, 86, 1)",
-              "rgba(75, 192, 192, 1)",
-            ],
-            borderWidth: 1,
-          },
-        ],
-      },
-    });
+  mounted() {
+    this.onPlayersChange();
   }
 }
 </script>

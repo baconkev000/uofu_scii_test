@@ -1,8 +1,8 @@
 <template>
   <div class="w-full flex space-between">
-    <div class="w-3/4 flex-col">
+    <div class="w-1/2 flex-col">
       <!-- Dropdown -->
-      <div class="flex flex-row justify-end w-5/6 py-8">
+      <div class="flex flex-row justify-end w-full py-8">
         <div class="relative inline-block text-left">
           <div>
             <button
@@ -62,7 +62,7 @@
       </div>
       <!-- Table -->
       <div
-        class="w-3/4 mx-auto overflow-x-auto overflow-y-auto h-screen shadow-lg"
+        class="w-full mx-auto overflow-x-auto overflow-y-auto h-screen shadow-lg"
       >
         <table class="w-full text-sm text-center rtl:text-right text-black">
           <thead class="text-xs text-gray-700 uppercase bg-gray-600 text-white">
@@ -109,7 +109,12 @@
         </table>
       </div>
     </div>
-    <PlayerVisuals :players="sortedPlayers" class="mt-24"></PlayerVisuals>
+    <div class="w-1/2 flex flex-col justify-center items-center">
+      <PlayerVisuals
+        :players="sortedPlayers"
+        :selectedLabel="selectedLabel"
+      ></PlayerVisuals>
+    </div>
   </div>
 </template>
 
@@ -138,6 +143,7 @@ export default class HomeView extends Vue {
   sortedPlayers: Player[] = [];
   attributes: string[] = [];
   isDropdownOpen = false;
+  selectedLabel = "Rating";
 
   toggleDropdown() {
     this.isDropdownOpen = !this.isDropdownOpen;
@@ -156,7 +162,7 @@ export default class HomeView extends Vue {
   }
 
   updateSorted(header: string): void {
-    console.log(header);
+    this.selectedLabel = header;
     header = header.split(" ").join("_");
     this.sortedPlayers = this.sortedPlayers.sort(
       (playerA: Player, playerB: Player) => {
@@ -199,7 +205,6 @@ export default class HomeView extends Vue {
   }
 
   async mounted() {
-    document.body.addEventListener("click", this.handleBodyClick);
     // get players
     try {
       const response = await APIService.getPlayers();
@@ -213,19 +218,6 @@ export default class HomeView extends Vue {
       this.attributes = response.data;
     } catch (error) {
       console.log(error);
-    }
-  }
-  beforeUnmount() {
-    // Remove the click event listener when the component is about to be destroyed
-    document.body.removeEventListener("click", this.handleBodyClick);
-  }
-
-  handleBodyClick(event: MouseEvent) {
-    // Check if the clicked element is outside the dropdown
-    const dropdownElement = this.$el.querySelector(".attr-dropdown");
-
-    if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
-      this.isDropdownOpen = false;
     }
   }
 }
