@@ -131,7 +131,7 @@ export default class PlayerVisuals extends Vue {
           ([d]: any) => -d.numeric,
           (d: any) => d.name
         )
-      ) // descending frequency
+      )
       .range([0, this.xMax]);
 
     const y = d3
@@ -150,7 +150,7 @@ export default class PlayerVisuals extends Vue {
       .attr("y", (d: any) => y(d.numeric))
       .attr("height", (d: any) => y(0) - y(d.numeric))
       .attr("width", x.bandwidth())
-      .attr("fill", (_d: any, i: number) => colorScale(i.toString())); // Convert index to string
+      .attr("fill", (_d: any, i: number) => colorScale(i.toString()));
 
     // Add the x-axis and label.
     svg
@@ -206,7 +206,3 @@ export default class PlayerVisuals extends Vue {
   }
 }
 </script>
-
-<style scoped>
-/* Add your styles here */
-</style>

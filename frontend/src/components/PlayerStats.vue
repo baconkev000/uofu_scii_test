@@ -12,7 +12,6 @@
 <script lang="ts">
 import { Vue, Options } from "vue-class-component";
 import type { PlayerFields } from "@/types/player_fields";
-import { Watch } from "vue-property-decorator";
 @Options({
   props: {
     player: Object as () => PlayerFields,
@@ -20,20 +19,5 @@ import { Watch } from "vue-property-decorator";
 })
 export default class PlayerStats extends Vue {
   player!: PlayerFields;
-
-  @Watch("player")
-  onPlayersChange() {
-    if (this.player !== undefined) {
-      console.log("test");
-    }
-  }
-
-  mounted() {
-    this.onPlayersChange();
-  }
 }
 </script>
-
-<style scoped>
-/* Add your styles here */
-</style>
