@@ -1,7 +1,10 @@
 <template>
   <div class="py-24 w-full overflow-x-auto">
-    <h2>{{ selectedLabel }}</h2>
-    <svg id="myPlot" class="border-2 border-slate-400 py-12 .scrollbar"></svg>
+    <h2 class="p-8 text-xl font-semibold">{{ selectedLabel }}</h2>
+    <svg
+      id="playerChart"
+      class="border-2 border-slate-400 py-12 .scrollbar"
+    ></svg>
   </div>
 </template>
 
@@ -16,7 +19,6 @@ import * as d3 from "d3";
     players: Array as () => PlayerFields[],
     selectedLabel: String,
     num_labels: Array as () => string[],
-    cat_labels: Array as () => string[],
   },
 })
 export default class PlayerVisuals extends Vue {
@@ -37,7 +39,7 @@ export default class PlayerVisuals extends Vue {
       (label: string) => label === this.selectedLabel
     );
     const svg = d3
-      .select("#myPlot")
+      .select("#playerChart")
       .attr(
         "viewBox",
         `0 -${isNumeric ? this.margin : 0} ${this.width} ${this.height}`
@@ -70,7 +72,6 @@ export default class PlayerVisuals extends Vue {
     // Prepare data for pie chart
     const pie = d3.pie<{ numeric: number }>().value((d: any) => d.numeric);
     const pieData = pie(cleanedPlayerData);
-    // Prepare data for pie chart
 
     // Define arc generator
     const arc = d3
@@ -197,7 +198,7 @@ export default class PlayerVisuals extends Vue {
 
   @Watch("selectedLabel")
   @Watch("players")
-  async onPlayersChange() {
+  onPlayersChange() {
     if (this.selectedLabel !== "Name") {
       this.updateChart();
     }

@@ -93,12 +93,13 @@
               v-for="player in sortedPlayers"
               :key="player.pk"
             >
-              <th
+              <td
                 scope="row"
-                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap font-bold"
+                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap font-medium"
+                @click="getSelectedPlayer(player.Name)"
               >
                 {{ player.Name }}
-              </th>
+              </td>
               <td
                 v-for="attr in selectedAttributes"
                 :key="attr"
@@ -114,7 +115,12 @@
     <div
       class="lg:w-1/2 w-full flex flex-col justify-center items-center bg-slate-200 px-4"
     >
+      <PlayerStats
+        v-if="showPlayerStats"
+        :player="selectedPlayer"
+      ></PlayerStats>
       <PlayerVisuals
+        v-else
         :players="sortedPlayers"
         :selectedLabel="selectedLabel"
       ></PlayerVisuals>
@@ -126,11 +132,13 @@
 import { Vue, Options } from "vue-class-component";
 import { APIService } from "@/services/api";
 import PlayerVisuals from "@/components/PlayerVisual.vue";
-import type { Player } from "@/types/player";
+import PlayerStats from "@/components/PlayerStats.vue";
+import { PlayerFields } from "@/types/player_fields";
 
 @Options({
   components: {
     PlayerVisuals,
+    PlayerStats,
   },
 })
 export default class HomeView extends Vue {
@@ -144,10 +152,12 @@ export default class HomeView extends Vue {
     "Dribbling",
     "Vision",
   ];
-  sortedPlayers: Player[] = [];
+  sortedPlayers: PlayerFields[] = [];
   attributes: string[] = [];
   isDropdownOpen = false;
   selectedLabel = "Rating";
+  showPlayerStats = false;
+  selectedPlayer: any = {};
 
   toggleDropdown() {
     this.isDropdownOpen = !this.isDropdownOpen;
@@ -166,10 +176,11 @@ export default class HomeView extends Vue {
   }
 
   updateSorted(header: string): void {
-    this.selectedLabel = header;
+    this.selectedLabel = header !== "Name" ? header : "Rating";
+    this.showPlayerStats = false;
     header = header.split(" ").join("_");
     this.sortedPlayers = this.sortedPlayers.sort(
-      (playerA: Player, playerB: Player) => {
+      (playerA: PlayerFields, playerB: PlayerFields) => {
         const aValue = playerA[header as keyof typeof playerA];
         const bValue = playerB[header as keyof typeof playerA];
 
@@ -206,6 +217,13 @@ export default class HomeView extends Vue {
         }
       }
     );
+  }
+  getSelectedPlayer(playerName: string) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    this.selectedPlayer = this.sortedPlayers.find(
+      (p: PlayerFields) => p.Name === playerName
+    )!;
+    this.showPlayerStats = true;
   }
 
   async mounted() {
