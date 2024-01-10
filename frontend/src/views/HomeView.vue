@@ -92,11 +92,11 @@
               class="bg-white border-b bg-slate-200 even:bg-gray-100 odd:bg-gray-200 hover:bg-white cursor-pointer"
               v-for="player in sortedPlayers"
               :key="player.pk"
+              @click="getSelectedPlayer(player.Name)"
             >
               <td
                 scope="row"
                 class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap font-medium"
-                @click="getSelectedPlayer(player.Name)"
               >
                 {{ player.Name }}
               </td>
