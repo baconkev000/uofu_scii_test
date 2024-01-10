@@ -1,6 +1,8 @@
 <template>
-  <div class="w-full flex space-between">
-    <div class="w-1/2 flex-col">
+  <div class="w-full flex space-between bg-slate-300 lg:flex-row flex-col">
+    <div
+      class="xl:w-1/2 w-full xl:flex-col flex-row px-4 h-max overflow-x-scroll"
+    >
       <!-- Dropdown -->
       <div class="flex flex-row justify-end w-full py-8">
         <div class="relative inline-block text-left">
@@ -109,7 +111,9 @@
         </table>
       </div>
     </div>
-    <div class="w-1/2 flex flex-col justify-center items-center">
+    <div
+      class="lg:w-1/2 w-full flex flex-col justify-center items-center bg-slate-200 px-4"
+    >
       <PlayerVisuals
         :players="sortedPlayers"
         :selectedLabel="selectedLabel"

@@ -1,9 +1,7 @@
 <template>
-  <div
-    class="py-24 w-full overflow-x-auto border-2 border-slate-300 bg-slate-200"
-  >
+  <div class="py-24 w-full overflow-x-auto">
     <h2>{{ selectedLabel }}</h2>
-    <svg id="myPlot" class="border-2 border-slate-500 overflow-x-auto"></svg>
+    <svg id="myPlot" class="border-2 border-slate-400 py-12 .scrollbar"></svg>
   </div>
 </template>
 
@@ -35,46 +33,98 @@ export default class PlayerVisuals extends Vue {
   yMax = this.height / 1.5 - this.margin * 2;
 
   updateChart() {
+    const isNumeric = num_labels.find(
+      (label: string) => label === this.selectedLabel
+    );
     const svg = d3
       .select("#myPlot")
-      .attr("viewBox", `0 -${this.margin} ${this.width} ${this.height}`);
+      .attr(
+        "viewBox",
+        `0 -${isNumeric ? this.margin : 0} ${this.width} ${this.height}`
+      );
 
     svg.selectAll("*").remove(); // Clear existing chart
 
     if (this.players.length > 0) {
-      this.createChart(svg);
+      if (isNumeric) {
+        this.createBarChart(svg);
+      } else {
+        this.createPieChart(svg);
+      }
     }
   }
+  createPieChart(svg: any) {
+    const uniqueLabelVals = Array.from(
+      new Set(
+        this.players.map((p: PlayerFields) => {
+          return p[this.selectedLabel] ? p[this.selectedLabel] : "N/A";
+        })
+      )
+    );
+    let cleanedPlayerData = uniqueLabelVals.map((uVal: any) => ({
+      name: uVal,
+      numeric: this.players.filter(
+        (player: PlayerFields) => player[this.selectedLabel] === uVal
+      ).length,
+    }));
+    // Prepare data for pie chart
+    const pie = d3.pie<{ numeric: number }>().value((d: any) => d.numeric);
+    const pieData = pie(cleanedPlayerData);
+    // Prepare data for pie chart
 
-  createChart(svg: any) {
+    // Define arc generator
+    const arc = d3
+      .arc()
+      .innerRadius(0)
+      .outerRadius(Math.min(this.width, this.height) / 2 - 1);
+
+    const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+
+    // Append pie slices
+    svg
+      .append("g")
+      .attr("transform", `translate(${this.width / 2},${this.height / 2})`)
+      .selectAll()
+      .data(pieData)
+      .join("path")
+      .attr("d", arc)
+      .attr("fill", (_d: any, i: number) => colorScale(i.toString())); // Convert index to string
+
+    // Append legend
+    const legend = svg
+      .append("g")
+      .attr("transform", `translate(${this.width - 150},${this.marginTop})`)
+      .selectAll()
+      .data(pieData)
+      .join("g")
+      .attr("transform", (d: any, i: number) => `translate(0,${i * 20})`);
+
+    legend
+      .append("rect")
+      .attr("width", 18)
+      .attr("height", 18)
+      .attr("fill", (_d: any, i: number) => colorScale(i.toString())); // Convert index to string
+
+    legend
+      .append("text")
+      .attr("x", 24)
+      .attr("y", 9)
+      .attr("dy", "0.35em")
+      .text((d: any) => d.data.name);
+  }
+
+  createBarChart(svg: any) {
     let cleanedPlayerData!: unknown[];
     let maxYTick = 0;
     let yAxisLabel = "";
 
-    if (num_labels.find((label: string) => label === this.selectedLabel)) {
-      cleanedPlayerData = this.players.map((p: PlayerFields) => ({
-        name: p.Name,
-        numeric: p[this.selectedLabel] ? p[this.selectedLabel] : 0,
-      }));
-      yAxisLabel = `${this.selectedLabel} Stats`;
-    } else {
-      const uniqueLabelVals = Array.from(
-        new Set(
-          this.players.map((p: PlayerFields) => {
-            return p[this.selectedLabel] ? p[this.selectedLabel] : "N/A";
-          })
-        )
-      );
-      cleanedPlayerData = uniqueLabelVals.map((uVal: any) => ({
-        name: uVal,
-        numeric: this.players.filter(
-          (player: PlayerFields) => player[this.selectedLabel] === uVal
-        ).length,
-      }));
-      yAxisLabel = `# of Players - ${this.selectedLabel}`;
-    }
+    cleanedPlayerData = this.players.map((p: PlayerFields) => ({
+      name: p.Name,
+      numeric: p[this.selectedLabel] ? p[this.selectedLabel] : 0,
+    }));
+    yAxisLabel = `${this.selectedLabel} Stats`;
     maxYTick = Math.max(...cleanedPlayerData.map((p: any) => p.numeric));
-    console.log(maxYTick, cleanedPlayerData);
+
     const x = d3
       .scaleBand()
       .domain(
@@ -148,7 +198,9 @@ export default class PlayerVisuals extends Vue {
   @Watch("selectedLabel")
   @Watch("players")
   async onPlayersChange() {
-    this.updateChart();
+    if (this.selectedLabel !== "Name") {
+      this.updateChart();
+    }
   }
 
   mounted() {
