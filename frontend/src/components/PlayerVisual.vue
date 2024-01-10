@@ -1,10 +1,7 @@
 <template>
   <div class="py-24 w-full overflow-x-auto">
     <h2 class="p-8 text-xl font-semibold">{{ selectedLabel }}</h2>
-    <svg
-      id="playerChart"
-      class="border-2 border-slate-400 py-12 .scrollbar"
-    ></svg>
+    <svg id="playerChart" class="py-12 .scrollbar"></svg>
   </div>
 </template>
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full flex space-between bg-slate-300 lg:flex-row flex-col">
+  <div class="w-full flex space-between lg:flex-row flex-col">
     <div
       class="xl:w-1/2 w-full xl:flex-col flex-row px-4 h-max overflow-x-scroll"
     >
@@ -113,7 +113,7 @@
       </div>
     </div>
     <div
-      class="lg:w-1/2 w-full flex flex-col justify-center items-center bg-slate-200 px-4"
+      class="lg:w-1/2 w-full flex flex-col bg-slate-300 justify-center items-center px-4"
     >
       <PlayerStats
         v-if="showPlayerStats"
