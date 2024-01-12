@@ -11,6 +11,9 @@ License: MIT
 
 Moved to [settings](http://cookiecutter-django.readthedocs.io/en/latest/settings.html).
 
+### Use Django shell in container
++ run `docker exec -it api_local_backend /bin/bash`
+
 ### Type checks
 
 Running type checks with manage.py:
